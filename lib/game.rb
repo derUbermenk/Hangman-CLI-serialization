@@ -19,7 +19,7 @@ class Game
   end
 
   def play
-    generate_word
+    generate_word if word.nil?
     display_guess_status(self.word, self.player.life)
     keep_playing until stop_conditions_met
 

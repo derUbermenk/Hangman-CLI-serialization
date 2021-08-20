@@ -21,9 +21,11 @@ module Display
 
   # @param saves [Array]
   def display_all_saves(saves)
+    puts " \nSaved games: "
     saves.map do |key, value|
-      "#{value.split('.')[0]} [#{key}]"
+      puts "#{value.split('.')[0]} [#{key}]"
     end.join(' ')
+    puts "--------------------- \n "
   end
 
   # Game display

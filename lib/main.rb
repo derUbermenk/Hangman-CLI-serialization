@@ -17,27 +17,33 @@ class Main
   def load_game
     saves = acquire_saves
     display_all_saves(saves)
-    display_choose_saves
-    save_num = gets.chomp
 
-    unless correct_input(save_num)
-      display_invalid_input_group
-      save_num = gets.chomp
+    save_name = saves[input_save_num(saves)]
+    YAML.load(File.read("saves/#{save_name}"))
+  end
+
+  def input_save_num(saves)
+    display_choose_saves
+    begin
+      save_num = gets.chomp.to_i
+    rescue
+      display_invalid_input
+      input_save_num
     end
 
-    save_name = saves[save_num]
-    YAML.load(File.read("saves/#{save_name}"))
+    save_num
   end
 
   def new_game
     Game.new
   end
 
+  # @return [Hash]
   def acquire_saves
-    saves = Dir['./saves/*.rb'].split('/')[2]
+    saves = Dir["./saves/*.yml"]
     item_count = 0
     saves.each_with_object({}) do |item, hash|
-      hash[i] = item
+      hash[item_count] = item.split('/')[2]
       item_count += 1
     end
   end
