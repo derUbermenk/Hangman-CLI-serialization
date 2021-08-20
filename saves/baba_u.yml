@@ -1,0 +1,27 @@
+--- !ruby/object:Game
+evaluator: !ruby/object:Evaluator {}
+player: !ruby/object:Player
+  life: 0
+word:
+  0: r
+  1: e
+  2: l
+  3: a
+  4: x
+  5: a
+  6: t
+  7: i
+  8: o
+  9: n
+choices:
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+quit_condition: 

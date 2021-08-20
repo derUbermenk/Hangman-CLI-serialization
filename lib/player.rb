@@ -34,7 +34,8 @@ class Player
     if input.downcase == 's' || input.downcase == 'q'
       [[input.downcase, nil]].to_h
     else
-      [input.split(' ')].to_h
+      input = [input.split(' ')].to_h
+      [[input.keys[0].to_i, input.values[0]]].to_h
     end
   end
 end

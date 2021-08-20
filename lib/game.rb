@@ -7,19 +7,20 @@ require_relative 'evaluator'
 class Game
   include Display
 
-  attr_accessor :evaluator, :player, 
-                :word, :choices
+  attr_accessor :evaluator, :player,
+                :word, :choices, :quit_condition
 
   def initialize
     @evaluator = Evaluator.new
     @player = Player.new
     @word = nil
     @choices = nil
+    @quit_condition = nil
   end
 
   def play
-    binding.pry
     generate_word
+    display_guess_status(self.word, self.player.life)
     keep_playing until stop_conditions_met
 
     report_end_terms
@@ -30,18 +31,20 @@ class Game
   def generate_word
     self.word = evaluator.make_word
     self.choices = self.word.keys
+
+    p self.word
   end
 
   def keep_playing
-    display_guess_status(self.word, self.player.life)
+    puts "\n"
     player_input = player.guess(self.choices)
     input_key = player_input.keys[0]
-
+    p input_key
     case input_key
     when 's' then save
     when 'q' then quit('q')
     else
-      evaluate(player_input)
+      evaluate_guess(player_input)
     end
   end
 
@@ -50,8 +53,7 @@ class Game
     Dir.mkdir('saves') unless Dir.exist?('saves')
 
     display_save_name_prompt
-    save_name = ' ' # initial save name
-    save_name = "#{clean_save_name(gets.chomp)}.yml" until name_valid(save_name)
+    save_name = "#{gets.chomp}.yml"
     File.open("saves/#{save_name}", 'w') { |file| file.write(self.to_yaml) }
     display_game_saved
   end
@@ -61,21 +63,23 @@ class Game
     space = ' '
     number = /\d/
 
-    name.include?(space) || !s[number].nil?
+    name.include?(space) || !name[number].nil?
   end
 
-  def evaluate(player_input)
+  def evaluate_guess(player_input)
+    puts "\n"
     guess_acc = evaluator.evaluate(player_input, self.word)
-
     update_word(player_input) if guess_acc == true
+    update_choices
     update_life if guess_acc == false
-
     display_guess_status(self.word, self.player.life)
   end
 
-  def update_word
+  def update_word(player_input)
     key = player_input.keys[0]
-    self.word[player_input[key]] = self.word.delete key
+    self.word.transform_keys! do |hash_key|
+      hash_key == key ? player_input[key] : hash_key
+    end
   end
 
   def update_choices
@@ -87,11 +91,11 @@ class Game
   end
 
   def stop_conditions_met
-    quit || guessed || no_turns_left
+    self.quit_condition || guessed || no_turns_left
   end
 
   def report_end_terms
-    if quit
+    if self.quit_condition 
       display_quit_message
     elsif guessed
       display_guessed_message
@@ -103,10 +107,7 @@ class Game
   end
 
   def quit(quit_prompt = 'n')
-    # quit_prompt == 'q'
-    return true if quit_prompt == 'q'
-
-    false
+    self.quit_condition = true if quit_prompt == 'q'
   end
 
   def guessed

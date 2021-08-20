@@ -27,8 +27,14 @@ module Display
   end
 
   # Game display
+
+  # @param word [Hash] where key is place holder, value is actual char
+  # @param player_life [Int]
   def display_guess_status(word, player_life)
-    keys = word.keys.map{|key| "#{[key]} "}
+    keys = word.keys.map do |key| 
+      "[#{key}]"
+      # key.instance_of?(Integer) ? "#{[key]} " : key
+    end
     puts " #{keys.join(' ')} \n  #{player_life} "
   end
 
